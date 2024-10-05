@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คิดเลขเกม</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #problem {
+            font-size: xxx-large;
+            white-space: pre-wrap; 
+            text-align: center; /* ชิดขวาสำหรับข้อความทั้งหมด */
+        }
+
+        .inline {
+            text-align: center;
+            float: inline-end;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Number Game</h1>
+        <div style="margin-right: 200px; margin-top: -150px; "><div id="problem" class="inline"></div></div>
+        <div style=" position: absolute;top: 400px; right: 20%;"><input type="text" id="userAnswer" placeholder="Your Answer">
+            <button onclick="checkAnswer()">Submit</button>
+            <div id="result"></div>
+            <button onclick="generateProblem()">Next Problem</button>
+            </div>
+            <div id="history"></div> <!-- ส่วนนี้เพื่อแสดงประวัติข้อมูล -->
+    </div>
+
+    <script>
+        let currentProblem;
+        let startTime;
+        let history = [];
+        let isInline = true; // ตัวแปรเพื่อเก็บสถานะการแสดงผล
+
+        document.addEventListener("DOMContentLoaded", function () {
+            generateProblem();
+        });
+
+        function generateProblem() {
+            const operand1 = Math.floor(Math.random() * 100000);
+            const operand2 = Math.floor(Math.random() * 100000);
+            const operator = '+';
+
+           
+            const strOperand1 = operand1.toString();
+            const strOperand2 = operand2.toString();
+
+         
+            const maxLength = Math.max(strOperand1.length, strOperand2.length);
+
+          
+            const formattedOperand1 = strOperand1.padStart(maxLength, ' ');
+            const formattedOperand2 = strOperand2.padStart(maxLength, ' ');
+
+          
+            const resultHTML = `
+                <div style="text-align: right;">
+                    ${formattedOperand1}<br>
+                    ${operator} ${formattedOperand2}
+                </div>
+            `;
+            currentProblem = operand1 + operand2; // คำนวณผลรวม
+            document.getElementById('problem').innerHTML = resultHTML;
+
+          
+
+            startTime = new Date();
+            document.getElementById('result').textContent = '';
+            document.getElementById('userAnswer').value = '';
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('userAnswer').value);
+            const endTime = new Date();
+            const elapsedTime = (endTime - startTime) / 1000;
+
+            if (isNaN(userAnswer)) {
+                document.getElementById('result').textContent = 'Please enter a valid number';
+            } else {
+                if (userAnswer === currentProblem) {
+                    document.getElementById('result').textContent = `Correct! Time taken: ${elapsedTime} seconds`;
+                    // เพิ่มข้อมูลของประวัติ
+                    history.push({
+                        problem: document.getElementById('problem').innerHTML,
+                        answer: userAnswer,
+                        time: elapsedTime
+                    });
+                    // แสดงประวัติ
+                    document.getElementById('history').innerHTML = '';
+                    history.forEach(item => {
+                        document.getElementById('history').innerHTML += `<div>Answer: ${item.answer}, Time: ${item.time} seconds</div>`;
+                    });
+                    generateProblem(); // เริ่มข้อใหม่อัตโนมัติ
+                } else {
+                    document.getElementById('result').textContent = 'Incorrect. Try again.';
+                }
+            }
+        }
+
+        document.getElementById('userAnswer').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+    </script>
+</body>
+
+</html>
